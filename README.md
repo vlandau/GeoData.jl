@@ -44,14 +44,13 @@ could use `NCDstack` instead.
 ```julia
 using GeoData, NCDatasets
 filename = download("https://www.unidata.ucar.edu/software/netcdf/examples/tos_O1_2001-2002.nc", "tos_O1_2001-2002.nc")
-A = NCDarrar(filename)
+A = NCDarray(filename)
 ```
 
 Now plot every third month in the first year, just using the regular index:
 
 ```julia
 using Plots
-pyplot()
 A[Ti(1:3:12)] |> plot
 ```
 
@@ -61,12 +60,13 @@ Now plot Australia in the first month of 2001.
 A[Ti(Contains(DateTime360Day(2001, 01, 17))), Lat(Between(0, -50)), Lon(Between(100, 160))] |> plot
 ```
 
-Now plot a mean over the timespan, then save it to disk :
+Now get the mean over the timespan, then save it to disk, and plot it :
 
 ```julia
-mean(A; dims=Ti) |> plot
-
-write("mean.netcdf, NCDarray, mean(A; dims=Ti)))
+using Statistics
+mean_tos = mean(A; dims=Ti)
+write("mean.ncd, NCDarray, mean_tos))
+plot(mean_tos; color=:viridis) 
 ```
 
 Or a transect of ocean surface temperature along the 20 degree latitude line:
@@ -74,6 +74,15 @@ Or a transect of ocean surface temperature along the 20 degree latitude line:
 ```julia
 A[Lat(Contains(20)), Ti(1)] |> plot
 ```
+pyplot()
+filename = download("https://www.unidata.ucar.edu/software/netcdf/examples/tos_O1_2001-2002.nc", "tos_O1_2001-2002.nc")
+A = NCDarray(filename)
+
+
+
+write("mean.netcdf", NCDarray, mean(A; dims=Ti))
+
+A[Lat(Contains(20)), Ti(1)] |> plot
 
 
 ## Works in progress
