@@ -396,7 +396,11 @@ _ncdmode(index::AbstractArray{<:Number}, dimtype, crs, dimcrs) = begin
     # Unless its a time dimension.
     order = _ncdorder(index)
     span = _ncdspan(index, order)
-    sampling = Intervals((dimtype <: TimeDim) ? Start() : Center())
+    # Using Points for time is a short-term fix as we can't yet get the interval 
+    # length from NetCDF metadata. Interval size is required to have `Regular` intervals 
+    # where the CF time at center of interval standard will work. Using `Irregular` where 
+    # bounds are +/- half the distance between points will not give accurate months.
+    sampling = dimtype <: TimeDim ? Points() : Intervals(Center())
     if dimtype in (Lat, Lon)
         Converted(order, span, sampling, crs, dimcrs)
     else
